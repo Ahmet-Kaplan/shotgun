@@ -7,7 +7,7 @@ include { SEQTK_SEQ                } from '../../modules/local/seqtk_seq'
 include { UCSC_FASPLIT             } from '../../modules/local/ucsc_fasplit'
 include { TRF_CLEAN                } from './trf_clean'
 include { MERGE_FASTQ              } from '../../modules/local/merge_fastq'
-include { BOWTIE2_ALIGN            } from '../../modules/nf-core/modules/bowtie2/align/main'
+include { BOWTIE2_ALIGN            } from '../../modules/nf-core/bowtie2/align/main'
 
 workflow KNEAD_DATA {
     take:

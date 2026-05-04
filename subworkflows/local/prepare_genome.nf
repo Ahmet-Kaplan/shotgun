@@ -2,7 +2,7 @@
 // Uncompress and prepare reference genome files
 //
 
-include { GUNZIP as GUNZIP_FASTA   } from '../../modules/nf-core/modules/gunzip/main'
+include { GUNZIP as GUNZIP_FASTA   } from '../../modules/nf-core/gunzip/main'
 include { METAPHLAN_INSTALL        } from '../../modules/local/metaphlan_install_database'
 include { KAIJU_INSTALL            } from '../../modules/local/kaiju_install_database'
 include { KRAKEN2_INSTALL          } from '../../modules/local/kraken_install_database'
@@ -10,7 +10,7 @@ include { HUMANN_INSTALL
     as HUMANN_INSTALL_NUCLEOTIDE   } from '../../modules/local/humann_install_database'
 include { HUMANN_INSTALL
     as HUMANN_INSTALL_PROTEIN      } from '../../modules/local/humann_install_database'
-include { BOWTIE2_BUILD            } from '../../modules/nf-core/modules/bowtie2/build/main'
+include { BOWTIE2_BUILD            } from '../../modules/nf-core/bowtie2/build/main'
 include { UNTAR as UNTAR_KRAKEN    } from '../../modules/local/untar'
 include { UNTAR as UNTAR_MOTU      } from '../../modules/local/untar'
 include { MOTUS_INSTALL            } from '../../modules/local/motus_install_database'

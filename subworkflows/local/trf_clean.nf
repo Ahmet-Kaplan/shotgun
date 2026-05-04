@@ -3,7 +3,7 @@
 //
 
 include { TRF                      } from '../../modules/local/trf'
-include { SEQTK_SUBSEQ             } from '../../modules/nf-core/modules/seqtk/subseq/main'
+include { SEQTK_SUBSEQ             } from '../../modules/nf-core/seqtk/subseq/main'
 
 workflow TRF_CLEAN {
     take:
