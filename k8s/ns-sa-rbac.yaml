@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Namespace, ServiceAccount and RBAC required for Nextflow's k8s executor.
+#
+# The ServiceAccount `nextflow-sa` is what the Nextflow head process uses to
+# create/watch/delete task pods inside the `nextflow` namespace. The Role
+# below grants just enough permissions for that — nothing cluster-wide.
+#
+# Apply first (before nas-secret.yaml and nas-pv-pvc.yaml):
+#   kubectl apply -f ns-sa-rbac.yaml
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nextflow
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nextflow-sa
+  namespace: nextflow
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: nextflow
+  name: nextflow-pod-manager
+
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "persistentvolumeclaims"]
+    verbs: ["create", "delete", "list", "get", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nextflow-sa-rolebinding
+  namespace: nextflow
+subjects:
+  - kind: ServiceAccount
+    name: nextflow-sa
+    namespace: nextflow
+roleRef:
+  kind: Role
+  name: nextflow-pod-manager
+  apiGroup: rbac.authorization.k8s.io
