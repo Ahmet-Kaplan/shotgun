@@ -1,0 +1,56 @@
+# ---------------------------------------------------------------------------
+# PersistentVolume + PersistentVolumeClaim for a CIFS/SMB NAS share.
+#
+# Before applying:
+#   1. Install the SMB CSI driver in the cluster:
+#        https://github.com/kubernetes-csi/csi-driver-smb
+#   2. Apply ns-sa-rbac.yaml and nas-secret.yaml first.
+#   3. Replace `<NAS-IP-OR-HOST>`, `<SHARE-NAME>` (and optionally `<SUBPATH>`)
+#      in `volumeAttributes.source` below.
+#   4. (Optional) Adjust `capacity.storage` and the PVC `requests.storage`
+#      to a value larger than your largest dataset; CIFS ignores quota,
+#      but k8s uses this value for scheduling/accounting.
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextflow-nas-pv
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "" # bind explicitly via the PVC's volumeName
+  csi:
+    driver: smb.csi.k8s.io
+    # Must be unique within the cluster.
+    volumeHandle: nextflow-nas-volume
+    volumeAttributes:
+      # The share path. Append `/<SUBPATH>` if you want to scope the mount
+      # to a subdirectory of the share (recommended on shared NAS servers).
+      # Example: "//192.168.1.10/data/nextflow"
+      source: "//<NAS-IP-OR-HOST>/<SHARE-NAME>/<SUBPATH-OPTIONAL>"
+    nodeStageSecretRef:
+      name: nas-creds
+      namespace: nextflow
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - noperm
+    - mfsymlinks
+    - vers=3.0 # pin SMB dialect; raise if your NAS requires 3.1.1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextflow-nas-pvc
+  namespace: nextflow
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  volumeName: nextflow-nas-pv # static binding to the PV above
+  storageClassName: ""
